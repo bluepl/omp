@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">OMP Multilevel ListView Navigation</string>
+    <string name="title_activity_albums">AlbumsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_alert_dialog_manager">AlertDialogManager</string>
+
+    <string name="title_activity_connection_detector">ConnectionDetector</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_jsonparser">JSONParser</string>
+    <string name="title_activity_track_list">TrackListActivity</string>
+    <string name="title_activity_single_track">SingleTrackActivity</string>
+    <string name="title_activity_media_player">MediaPlayerActivity</string>
+    <string name="title_activity_record_audio">RecordAudioActivity</string>
+    <string name="title_activity_upload_to_server">UploadToServer</string>
+    <string name="title_activity_audio_capture">AudioCaptureActivity</string>
+    <string name="title_activity_insert">InsertActivity</string>
+</resources>
