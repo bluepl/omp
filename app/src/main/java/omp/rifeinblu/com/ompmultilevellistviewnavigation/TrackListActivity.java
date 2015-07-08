@@ -1,21 +1,8 @@
 package omp.rifeinblu.com.ompmultilevellistviewnavigation;
 
-import android.app.ListActivity;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -23,14 +10,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import omp.rifeinblu.com.ompmultilevellistviewnavigation.helper.AlertDialogManager;
 import omp.rifeinblu.com.ompmultilevellistviewnavigation.helper.ConnectionDetector;
 import omp.rifeinblu.com.ompmultilevellistviewnavigation.helper.JSONParser;
 
+import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class TrackListActivity extends ListActivity {
     // Connection detector
@@ -55,14 +51,14 @@ public class TrackListActivity extends ListActivity {
 
     // tracks JSON url
     // id - should be posted as GET params to get track list (ex: id = 5)
-    private static final String URL_ALBUMS = "http://api.androidhive.info/songs/album_tracks.php";
+    private static final String URL_ALBUMS = "http://192.168.0.108/ompGetTracks.php";
 
     // ALL JSON node names
     private static final String TAG_SONGS = "songs";
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
     private static final String TAG_ALBUM = "album";
-    private static final String TAG_DURATION = "duration";
+    private static final String TAG_DURATION = "created_at";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,12 +102,14 @@ public class TrackListActivity extends ListActivity {
 
                 // to get song information
                 // both album id and song is needed
-                String album_id = ((TextView) view.findViewById(R.id.album_id)).getText().toString();
+                String song_url = ((TextView) view.findViewById(R.id.song_url)).getText().toString();
                 String song_id = ((TextView) view.findViewById(R.id.song_id)).getText().toString();
 
-                Toast.makeText(getApplicationContext(), "Album Id: " + album_id + ", Song Id: " + song_id, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Song Id: " + song_id  + ", Song Url: " + song_url, Toast.LENGTH_SHORT).show();
 
-                i.putExtra("song_id", "hosannatelugu.mp3");
+                i.putExtra("album_id", album_id);
+                i.putExtra("song_url", song_url);
+                i.putExtra("song_id", song_id);
 
                 startActivity(i);
             }
@@ -145,7 +143,7 @@ public class TrackListActivity extends ListActivity {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
 
             // post album id as GET parameter
-            params.add(new BasicNameValuePair(TAG_ID, album_id));
+            params.add(new BasicNameValuePair("album_id", album_id));
 
             // getting JSON string from URL
             String json = jsonParser.makeHttpRequest(URL_ALBUMS, "GET",
@@ -156,10 +154,11 @@ public class TrackListActivity extends ListActivity {
 
             try {
                 JSONObject jObj = new JSONObject(json);
+
                 if (jObj != null) {
-                    String album_id = jObj.getString(TAG_ID);
-                    album_name = jObj.getString(TAG_ALBUM);
-                    albums = jObj.getJSONArray(TAG_SONGS);
+                    String album_id = jObj.getString("id");
+                    album_name = jObj.getString("album");
+                    albums = jObj.getJSONArray("songs");
 
                     if (albums != null) {
                         // looping through All songs
@@ -167,18 +166,20 @@ public class TrackListActivity extends ListActivity {
                             JSONObject c = albums.getJSONObject(i);
 
                             // Storing each json item in variable
-                            String song_id = c.getString(TAG_ID);
+                            String song_id = c.getString("mid");
+                            String song_url = c.getString("url");
                             // track no - increment i value
                             String track_no = String.valueOf(i + 1);
-                            String name = c.getString(TAG_NAME);
-                            String duration = c.getString(TAG_DURATION);
+                            String name = c.getString("name");
+                            String duration = c.getString("updated_at");
 
                             // creating new HashMap
                             HashMap<String, String> map = new HashMap<String, String>();
 
                             // adding each child node to HashMap key => value
                             map.put("album_id", album_id);
-                            map.put(TAG_ID, song_id);
+                            map.put("song_id", song_id);
+                            map.put("song_url", song_url);
                             map.put("track_no", track_no + ".");
                             map.put(TAG_NAME, name);
                             map.put(TAG_DURATION, duration);
@@ -212,9 +213,9 @@ public class TrackListActivity extends ListActivity {
                      * */
                     ListAdapter adapter = new SimpleAdapter(
                             TrackListActivity.this, tracksList,
-                            R.layout.list_item_tracks, new String[] { "album_id", TAG_ID, "track_no",
+                            R.layout.list_item_tracks, new String[] { "album_id", "song_id", "song_url", "track_no",
                             TAG_NAME, TAG_DURATION }, new int[] {
-                            R.id.album_id, R.id.song_id, R.id.track_no, R.id.album_name, R.id.song_duration });
+                            R.id.album_id, R.id.song_id, R.id.song_url, R.id.track_no, R.id.album_name, R.id.song_duration });
                     // updating listview
                     setListAdapter(adapter);
 

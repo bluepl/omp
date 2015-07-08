@@ -45,22 +45,25 @@ public class SingleTrackActivity extends Activity {
     // Album id
     String album_id = null;
     String song_id = null;
-
+    String song_url = null;
     String album_name, song_name, duration;
 
     // single song JSON url
     // GET parameters album, song
-    private static final String URL_SONG = "http://api.androidhive.info/songs/track.php";
+    private static final String URL_SONG = "http://192.168.0.108/songs/ompGetTrackInfo.php";
 
     // ALL JSON node names
     private static final String TAG_NAME = "name";
-    private static final String TAG_DURATION = "duration";
-    private static final String TAG_ALBUM = "album";
+    private static final String TAG_DURATION = "created_at";
+    private static final String TAG_ALBUM = "cid";
 
+    private TextView urlText;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_track);
+        urlText = (TextView) findViewById(R.id.album_name);
+        urlText.setText(song_url);
 
         cd = new ConnectionDetector(getApplicationContext());
 
@@ -77,10 +80,11 @@ public class SingleTrackActivity extends Activity {
         Intent i = getIntent();
         album_id = i.getStringExtra("album_id");
         song_id = i.getStringExtra("song_id");
-
+        song_url = i.getStringExtra("song_url");
         // calling background thread
         new LoadSingleTrack().execute();
     }
+
 
     /**
      * Background Async Task to get single song information
@@ -108,8 +112,8 @@ public class SingleTrackActivity extends Activity {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
 
             // post album id, song id as GET parameters
-            params.add(new BasicNameValuePair("album", album_id));
-            params.add(new BasicNameValuePair("song", song_id));
+            //params.add(new BasicNameValuePair("album", album_id));
+            params.add(new BasicNameValuePair("song_id", song_id));
 
             // getting JSON string from URL
             String json = jsonParser.makeHttpRequest(URL_SONG, "GET",

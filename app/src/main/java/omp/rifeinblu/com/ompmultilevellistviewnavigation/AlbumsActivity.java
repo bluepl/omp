@@ -15,6 +15,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
 import org.json.JSONArray;
@@ -49,13 +50,17 @@ public class AlbumsActivity extends ListActivity {
     JSONArray albums = null;
 
     // albums JSON url
-    private static final String URL_ALBUMS = "http://api.androidhive.info/songs/albums.php";
+   // private static final String URL_ALBUMS = "http://api.androidhive.info/songs/albums.php";
+    private static final String URL_ALBUMS = "http://192.168.0.108/ompGetCategories.php";
 
     // ALL JSON node names
-    private static final String TAG_ID = "id";
+    /*private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
-    private static final String TAG_SONGS_COUNT = "songs_count";
+    private static final String TAG_SONGS_COUNT = "songs_count";*/
 
+    private static final String TAG_ID = "cid";
+    private static final String TAG_NAME = "name";
+    private static final String TAG_SONGS_COUNT = "cid";
 
     public void startPlayer(View view) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
@@ -107,6 +112,9 @@ public class AlbumsActivity extends ListActivity {
                 // send album id to tracklist activity to get list of songs under that album
                 String album_id = ((TextView) view.findViewById(R.id.album_id)).getText().toString();
                 i.putExtra("album_id", album_id);
+
+
+                Toast.makeText(getApplicationContext(), "Album Id: " + album_id, Toast.LENGTH_SHORT).show();
 
                 startActivity(i);
             }

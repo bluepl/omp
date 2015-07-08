@@ -27,8 +27,8 @@ public class MediaPlayerActivity extends Activity {
     private int forwardTime = 2000, backwardTime = 2000;
     private Handler durationHandler = new Handler();
     private SeekBar seekbar;
-    String song_id, url;
-    String urlHead = "http://android.programmerguru.com/wp-content/uploads/2013/04/";
+    String shortUrl, url;
+    String urlHead = "http://rifeinblu.com/AndroidFileUpload/uploads";
 
 
     @Override
@@ -37,9 +37,8 @@ public class MediaPlayerActivity extends Activity {
 
         //hosannatelugu.mp3
         Intent i = getIntent();
-        song_id = i.getStringExtra("song_id");
-
-        url = urlHead + song_id;
+        shortUrl = i.getStringExtra("song_url");
+        url = urlHead + shortUrl;
 
         //set the layout of the Activity
         setContentView(R.layout.activity_media_player);
@@ -76,10 +75,11 @@ public class MediaPlayerActivity extends Activity {
             }
             try {
                 mediaPlayer.prepare();
+                seekbar.setMax(mediaPlayer.getDuration());
             } catch (IllegalStateException e) {
-                Toast.makeText(getApplicationContext(), "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Prep: You might not set the URI correctly!", Toast.LENGTH_LONG).show();
             } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Prep: You might not set the URI correctly!", Toast.LENGTH_LONG).show();
             }
             mediaPlayer.start();
             finalTime = mediaPlayer.getDuration();

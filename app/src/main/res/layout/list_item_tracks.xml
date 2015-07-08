@@ -16,7 +16,15 @@
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
+    <!-- Song url / Hidden by default -->
+    <TextView
+        android:id="@+id/song_url"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <!-- Track serial no -->
+
     <TextView
         android:id="@+id/track_no"
         android:layout_width="wrap_content"

@@ -47,7 +47,7 @@ public class UploadToServer extends Activity implements OnClickListener{
 
     private TextView messageText;
     private Button uploadButton, btnselectpic;
-    private ImageView imageview;
+    //private ImageView imageview;
     private int serverResponseCode = 0;
     private ProgressDialog dialog = null;
 
@@ -61,6 +61,7 @@ public class UploadToServer extends Activity implements OnClickListener{
     /**
      * *******  File Path ************
      */
+    String loggedInUser = "";
     String file_desc = "";
     String file_id = "";
     String file_name = "";
@@ -72,10 +73,10 @@ public class UploadToServer extends Activity implements OnClickListener{
 
     String uid_text = null;
     String name_text = null;
-    String city_text = null;
+    String category_text = null;
     EditText uid = null;
     EditText name = null;
-    EditText city = null;
+    EditText category = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,7 +88,7 @@ public class UploadToServer extends Activity implements OnClickListener{
         uploadButton = (Button)findViewById(R.id.uploadButton);
         messageText  = (TextView)findViewById(R.id.messageText);
         btnselectpic = (Button)findViewById(R.id.button_selectpic);
-        imageview = (ImageView)findViewById(R.id.imageView_pic);
+        //imageview = (ImageView)findViewById(R.id.imageView_pic);
         Intent i = getIntent();
         file_desc = i.getStringExtra("file_desc");
         file_name =  i.getStringExtra("file_name");
@@ -101,16 +102,16 @@ public class UploadToServer extends Activity implements OnClickListener{
         update = (Button) findViewById(R.id.btn_updateDb);
 
 
-        uid = (EditText) findViewById(R.id.uid);
+        //uid = (EditText) findViewById(R.id.uid);
         name = (EditText) findViewById(R.id.name);
-        city = (EditText) findViewById(R.id.city);
+        category = (EditText) findViewById(R.id.category);
 
         update.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                uid_text = uid.getText().toString();
-                name_text = name.getText().toString();
-                city_text = city.getText().toString();
+                // uid_text = uid.getText().toString(); //name
+                name_text = name.getText().toString(); //genre
+                category_text = category.getText().toString(); //category == genre
                 new insertDATA().execute("");
             }
         });
@@ -122,13 +123,25 @@ public class UploadToServer extends Activity implements OnClickListener{
         protected String doInBackground(String... arg0) {
             ArrayList<NameValuePair> values = new ArrayList<NameValuePair>();
 
-            values.add(new BasicNameValuePair("uid", uid_text));
-            values.add(new BasicNameValuePair("name", file_name));
-            values.add(new BasicNameValuePair("city", file_desc));
+            String extractedFileName = "";
+            int rightPosition = 0;
+            for(int i=0; i < file_desc.length(); i++){
+                if(file_desc.charAt(i) == '/') {
+                    rightPosition = file_desc.length() - i;
+                }
+            }
+            extractedFileName = file_desc.substring(file_desc.length() - rightPosition);
+
+            // values.add(new BasicNameValuePair("id", null));
+            values.add(new BasicNameValuePair("name", name_text));
+            values.add(new BasicNameValuePair("url", extractedFileName));
+            values.add(new BasicNameValuePair("created_by", loggedInUser));
+            values.add(new BasicNameValuePair("isActivated", "1"));
+            values.add(new BasicNameValuePair("cid", category_text));
 
             try {
                 DefaultHttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("http://rifeinblu.com/AndroidFileUpload/insertDATA.php");
+                HttpPost httppost = new HttpPost("http://192.168.0.108/insertDATA.php");
                 httppost.setEntity(new UrlEncodedFormEntity(values));
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
@@ -141,7 +154,7 @@ public class UploadToServer extends Activity implements OnClickListener{
 
             try {
                 BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is, "iso-8859-1"), 8);
+                        new InputStreamReader(is, "UTF-8"), 8);
                 StringBuilder sb = new StringBuilder();
                 while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
@@ -190,16 +203,17 @@ public class UploadToServer extends Activity implements OnClickListener{
                     if(audiopath==null)
                     {
                         uploadFile(file_desc);
-                        uid_text = uid.getText().toString();
+                        uid_text = "";
                         name_text = name.getText().toString();
-                        city_text = city.getText().toString();
+                        category_text = category.getText().toString();
                         new insertDATA().execute("");
 
                     }else {
-                        uploadFile(audiopath);
-                        uid_text = uid.getText().toString();
+                        file_desc = audiopath;
+                        uploadFile(file_desc);
+                        uid_text = "";
                         name_text = name.getText().toString();
-                        city_text = city.getText().toString();
+                        category_text = category.getText().toString();
                         new insertDATA().execute("");
                     }
                 }
@@ -216,8 +230,8 @@ public class UploadToServer extends Activity implements OnClickListener{
 
             Uri selectedAudioUri = data.getData();
             audiopath = getPath(selectedAudioUri);
-            Bitmap bitmap=BitmapFactory.decodeFile(audiopath);
-            imageview.setImageBitmap(bitmap);
+            //Bitmap bitmap=BitmapFactory.decodeFile(audiopath);
+            //imageview.setImageBitmap(bitmap);
             messageText.setText("Uploading file path:" +audiopath);
 
         }
